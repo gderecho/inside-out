@@ -4,6 +4,7 @@ import processing.serial.*;
 import java.io.*;
 import java.util.*;
 
+
 PFont font;
 Scrollbar scaleBar;
 Serial port;
@@ -34,10 +35,15 @@ boolean beat = false;    // set when a heart beat is detected, then cleared
 ArrayList<Integer> current_bpm_set = new ArrayList<Integer>();
 String base_path = "/Users/John/Documents/Inside_Out/inside-out/music_files";
 String current_mood = "happy";
-int bpm_buffer_size = 500;
+String song_name = "";
+int bpm_buffer_size = 1000;
 Filenames file_names = new Filenames();
 Minim minim;
 AudioPlayer song;
+boolean fade = false;
+long time1 = 0;
+int time2;
+int wait = 3000;
 
 void settings(){
   size(900,600);
@@ -197,6 +203,7 @@ void draw()
     int c_md_state = getMoodState(current_mood);
     
     String music_name = file_names.get_filename(c_md_state);
+    song_name = music_name;
     //println(music_name);
     //println(c_md);
     song = minim.loadFile(base_path+"/" + current_mood + "/" + music_name + "/");
@@ -208,36 +215,98 @@ void draw()
 
   } else if (take_care_flag){
     /* if current mood is different */
-    
+    Textlabel text = cp5.addTextlabel("label")
+                   .setText("Now Playing: " + song_name.substring(0,song_name.length()-4))
+                   .setPosition(0,0)
+                   .setColorValue(0xffffff00)
+                   .setFont(createFont("Times",24));
+                    
     String c_md = mood_selector();
     //println("the true loop");
-    println(c_md);
+    //println(c_md);
     int c_md_state = getMoodState(c_md);
     
     if (c_md.equals(current_mood)){
       c_md = "not changing";
     }
-
+    
+    //if(millis() - time1 >= wait){
+    //    println("tick");//if it is, do something
+    //    time1 = millis();//also update the stored time
+    //    fade = false;
+    //    song.close();
+    //  }
+      
+      //if (song.getGain() < -18.0){
+      //  fade = false;
+      //  song.close();
+      //}
+    
+    println(fade);
+    
     if(!c_md.equals("not changing")){  //no changing when the array is not filled up
-      println("debug 2");
+      //println("debug 2");
+      
+      if (!fade){
+        song.shiftGain(0, -200, wait);
+        fade = true;
+        time1 = millis();
+        println(time1);
+      } 
+        println(time1);
+        
+      if (millis() - time1 >= wait){
+       time1 = millis();
+       fade = false;
+       song.pause();
+       println("tick");
+     }
+      //}
+      
+      //song.close();
+      
+      //print(song.getGain());
+      
+      //if(millis() - time1 >= wait){
+      //  println("tick");//if it is, do something
+      //  time1 = millis();//also update the stored time
+      //  fade = false;
+      //  song.close();
+      //}
+      
+      //if (song.getGain() < -40.0){
+      // fade = false;
+      // song.close();
+      //}
+      //song.close();
+      
+      
+      
       //if (song.isPlaying()){
-        song.shiftGain(0, -20, 5000);
-        song.close();
+        //song.shiftGain(0, -20, 5000);
+        //song.close();
       //}
       
       String music_name = file_names.get_filename(c_md_state);
+      song_name = music_name;
       //println(music_name);
       //println(c_md);
       song = minim.loadFile(base_path+"/" + c_md + "/" + music_name + "/");
       //song.rewind();
+      
       song.setGain(-50);
       song.play();
-      song.shiftGain(-50, 0, 2000);
+      song.shiftGain(-50, 0, wait);
+      
+      text = cp5.addTextlabel("label")
+                   .setText("Now Playing: " + song_name.substring(0,song_name.length()-4))
+                   .setPosition(0,0)
+                   .setColorValue(0xffffff00)
+                   .setFont(createFont("Times",24));
+      
     }
 
   }
-
-
 
 }
 
