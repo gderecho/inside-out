@@ -35,7 +35,8 @@ boolean beat = false;    // set when a heart beat is detected, then cleared
 
 
 /* from serialEvent */
-void serialEvent(Serial port){ 
+void serialEvent(Serial port)
+{ 
    String inData = port.readStringUntil('\n');
    inData = trim(inData);                 // cut off white space (carriage return)
    
@@ -66,9 +67,9 @@ void setup()
   test = new Button(300,300,begin.width,begin.height, begin);
   state = BEGIN;
   
-  // GO FIND THE ARDUINO
+                              // GO FIND THE ARDUINO
   println(Serial.list());    // print a list of available serial ports
-  // choose the number between the [] that is connected to the Arduino
+                             // choose the number between the [] that is connected to the Arduino
   port = new Serial(this, Serial.list()[1], 115200);  // make sure Arduino is talking serial at this baud rate
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
@@ -118,9 +119,26 @@ void draw()
     {    
       vertex(x+10, ScaledY[x]);                    //draw a line connecting the data points
     }
-      endShape(); 
+      endShape();
+      
+      
+   
       
   }
+  
+   fill(250,0,0);
+    stroke(250,0,0);
+                    // the 'heart' variable is set in serialEvent when arduino sees a beat happen
+    heart--;                    // heart is used to time how long the heart graphic swells when your heart beats
+    heart = max(heart,0);       // don't let the heart variable go into negative numbers
+    if (heart > 0)
+    {             // if a beat happened recently, 
+      strokeWeight(8);          // make the heart big
+    }
+    smooth();   // draw the heart with two bezier curves
+    bezier(width-100,50, width-20,-20, width,140, width-100,150);
+    bezier(width-100,50, width-190,-20, width-200,140, width-100,150);
+    strokeWeight(1);
   
   if(test.pressed() && take_care_flag==false)
   {
