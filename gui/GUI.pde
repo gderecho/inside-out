@@ -34,7 +34,7 @@ boolean beat = false;    // set when a heart beat is detected, then cleared
 ArrayList<Integer> current_bpm_set = new ArrayList<Integer>();
 String base_path = "/Users/John/Documents/Inside_Out/inside-out/music_files";
 String current_mood = "happy";
-int bpm_buffer_size = 50;
+int bpm_buffer_size = 500;
 Filenames file_names = new Filenames();
 Minim minim;
 AudioPlayer song;
@@ -213,19 +213,23 @@ void draw()
     //println("the true loop");
     println(c_md);
     int c_md_state = getMoodState(c_md);
+    
+    if (c_md.equals(current_mood)){
+      c_md = "not changing";
+    }
 
     if(!c_md.equals("not changing")){  //no changing when the array is not filled up
       println("debug 2");
-      if (song.isPlaying()){
-        song.shiftGain(0, -50, 2000);
+      //if (song.isPlaying()){
+        song.shiftGain(0, -20, 5000);
         song.close();
-      }
+      //}
       
       String music_name = file_names.get_filename(c_md_state);
       //println(music_name);
       //println(c_md);
       song = minim.loadFile(base_path+"/" + c_md + "/" + music_name + "/");
-      song.rewind();
+      //song.rewind();
       song.setGain(-50);
       song.play();
       song.shiftGain(-50, 0, 2000);
@@ -248,15 +252,16 @@ void update_current_mood(int bpm){
 
 /* select the mood */
 String mood_selector(){
-  //int slope = 0;
+  double slope = 0.0;
   int bpm = 0;
   if (current_bpm_set.size() == bpm_buffer_size){
     println("mood selector true");
-    //for (int i = 0; i < current_bpm_set.size()-1; i++ ){
-    //  slope += current_bpm_set.get(i+1) - current_bpm_set.get(i+1);
-    //}
-    //slope = slope / (current_bpm_set.size()-1);
-    //println(slope);
+    for (int i = 0; i < current_bpm_set.size()-1; i++ ){
+     slope += current_bpm_set.get(i+1) - current_bpm_set.get(i);     
+    }
+    slope = slope / (double)(current_bpm_set.size()-1);
+    println(slope);
+    
     /* choose the mood according to slope*/
     /*stressed slope = 1.225*/
     /*tired slope = -1.45*/
@@ -277,53 +282,56 @@ String mood_selector(){
     int STRESSED = 4;
     int TIRED   = 5;
     
-    //if (slope <= 0.25 && slope > -0.6){
-    //  return "calm";
-    //} else if (slope > 0.25 && slope <= 0.6){
-    //  return "happy";
-    //} else if (slope > 0.6 && slope <= 1){
-    //  return "anxious";
-    //} else if (slope > 1 && slope <= 1.21){
-    //  return "angry";
-    //} else if (slope > 1.21){
-    //  return "stressed";
-    //} else{
-    //  return "tired";
-    //}
-    if (bpm < 70){
-      return "tired";
-    } else if (bpm < 80){
-      return "happy";
-    } else if (bpm < 90){
+    if (slope > 0){
+      if (bpm < 70){
+       return "tired";
+      } else if (bpm < 80){
+       return "happy";
+      } else if (bpm < 90){
+       return "calm";
+      } else if (bpm < 100){
+       return "anxious";
+      } else if (bpm < 110){
+       return "stressed";
+      } else{
+       return "angry";
+      }
+    } else if (slope == 0){
       return "calm";
-    } else if (bpm < 100){
-      return "anxious";
-    } else if (bpm < 110){
-      return "stressed";
-    } else{
-      return "angry";
+    } else{  // slope < 0
+      if (bpm < 70){
+       return "tired";
+      } else if (bpm < 80){
+       return "tired";
+      } else if (bpm < 90){
+       return "happy";
+      } else if (bpm < 100){
+       return "happy";
+      } else if (bpm < 110){
+       return "happy";
+      } else{
+       return "happy";
+      }
     }
+    
+    //if (bpm < 70){
+    // return "tired";
+    //} else if (bpm < 80){
+    // return "happy";
+    //} else if (bpm < 90){
+    // return "calm";
+    //} else if (bpm < 100){
+    // return "anxious";
+    //} else if (bpm < 110){
+    // return "stressed";
+    //} else{
+    // return "angry";
+    //}
     
   } else{
     return "not changing";
   }
   
-  
-  //switch(slope){
-  //  case (slope <= 0.25 && slope > -0.6):
-  //      return "calm";
-  //  case slope > 0.25 && slope <= 0.6 :
-  //      return "happy";
-  //  case slope > 0.6 && slope <= 1:
-  //      return "anxious";
-  //  case slope > 1 && slope <= 1.21 :
-  //      return "angry";
-  //  case slope > 1.21: 
-  //      return "stressed";
-  //  default : 
-  //     return "tired";
-  //}
-
 }
 
 
