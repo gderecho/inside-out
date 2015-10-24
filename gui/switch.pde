@@ -17,20 +17,49 @@ rand = new Random();
 filenames = new ArrayList[6];
 
 filenames[ANGRY] = new ArrayList();
-filenames[ANGRY].add("dies_irae.mp3");
-filenames[ANGRY].add("moonlight_iii.mp3");
+//filenames[ANGRY].add("dies_irae.mp3");
+//filenames[ANGRY].add("moonlight_iii.mp3");
+final File angry_folder = new File("/Users/John/Documents/Inside_Out/inside-out/music_files/angry");
+filenames[ANGRY] = listFilesForFolder_array(angry_folder);
+
 filenames[ANXIOUS] = new ArrayList();
-filenames[ANXIOUS].add("sacre_2.mp3");
+final File anxious_folder = new File("/Users/John/Documents/Inside_Out/inside-out/music_files/anxious");
+filenames[ANXIOUS] = listFilesForFolder_array(anxious_folder);
+//filenames[ANXIOUS].add("sacre_2.mp3");
+
 filenames[CALM] = new ArrayList();
-filenames[CALM].add("Calm Music - River Flows in You by Yiruma.mp3");
-filenames[CALM].add("deutsches_reqiem_1.mp3", "pachelbel.mp3");
-filenames[CALM].add("Relaxation Music 11 - Tea Ceremony.mp3");
-filenames[CALM].add("Relax Music 2.mp3","Relax Music 3.mp3");
-filenames[CALM].add("Relax Music 8.mp3");
+final File calm_folder = new File("/Users/John/Documents/Inside_Out/inside-out/music_files/calm");
+filenames[CALM] = listFilesForFolder_array(calm_folder);
+
+//filenames[CALM].add("Calm Music - River Flows in You by Yiruma.mp3");
+//filenames[CALM].add("deutsches_reqiem_1.mp3", "pachelbel.mp3");
+//filenames[CALM].add("Relaxation Music 11 - Tea Ceremony.mp3");
+//filenames[CALM].add("Relax Music 2.mp3","Relax Music 3.mp3");
+//filenames[CALM].add("Relax Music 8.mp3");
 filenames[HAPPY] = new ArrayList();
+final File happy_folder = new File("/Users/John/Documents/Inside_Out/inside-out/music_files/happy");
+filenames[HAPPY] = listFilesForFolder_array(happy_folder);
+
 filenames[STRESSED] = new ArrayList();
-filenames[STRESSED].add("sacre_1.mp3")
+final File stressed_folder = new File("/Users/John/Documents/Inside_Out/inside-out/music_files/stressed");
+filenames[STRESSED] = listFilesForFolder_array(stressed_folder);
+//filenames[STRESSED].add("sacre_1.mp3");
+
 filenames[TIRED] = new ArrayList();
+final File tired_folder = new File("/Users/John/Documents/Inside_Out/inside-out/music_files/tired");
+filenames[TIRED] = listFilesForFolder_array(tired_folder);
+}
+
+/* return arraylist of files in the folder*/
+ArrayList<String> listFilesForFolder_array(final File folder){
+  
+  ArrayList<String> list_of_files = new ArrayList<String>();
+  
+  for (final File fileEntry : folder.listFiles()) { 
+       list_of_files.add(fileEntry.getName());
+    }
+    
+   return list_of_files;
 }
 
 String get_filename(int state)
