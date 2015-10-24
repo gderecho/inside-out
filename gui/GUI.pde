@@ -2,6 +2,7 @@ import controlP5.*;
 import ddf.minim.*;
 import processing.serial.*;
 import java.io.*;
+import java.util.*;
 
 PFont font;
 Scrollbar scaleBar;
@@ -31,11 +32,16 @@ int BPMWindowWidth = 180;
 int BPMWindowHeight = 340;
 boolean beat = false;    // set when a heart beat is detected, then cleared
 ArrayList<Integer> current_bpm_set = new ArrayList<Integer>();
-String base_path = "/Users/nicholasdraper/Documents/MuddHacks/inside-out/music_files/";
+String base_path = "/Users/John/Documents/Inside_Out/inside-out";
+String current_mood = "";
+Filenames file_names = new Filenames();
+
+void settings(){
+  size(900,600);
+}
 
 void setup() 
-{
-  size(900,600);
+{ 
   pic = loadImage("img/mudd_hacks_splash_no_button.png");
   cp5 = new ControlP5(this);
   noStroke();
@@ -84,9 +90,8 @@ void draw()
   {
 
     update_current_mood(BPM);
-    int mood = mood_selector();
-    String  music_name = Filenames.get_filename(mood);
-
+    // int mood = mood_selector();
+    // String  music_name = Filenames.get_filename(mood);
 
 
   background(0,0,0);
@@ -216,21 +221,35 @@ String mood_selector(){
   int HAPPY   = 3;
   int STRESSED = 4;
   int TIRED   = 5;
-
-  switch(slope){
-    case slope <= 0.25 && slope > -0.6:
-        return "calm";
-    case slope > 0.25 && slope <= 0.6 :
-        return "happy";
-    case slope > 0.6 && slope <= 1:
-        return "anxious";
-    case slope > 1 && slope <= 1.21 :
-        return "angry";
-    case slope > 1.21 
-        return "stressed";
-    default : 
-       return "tired";
+  
+  if (slope <= 0.25 && slope > -0.6){
+    return "calm";
+  } else if (slope > 0.25 && slope <= 0.6){
+    return "happy";
+  } else if (slope > 0.6 && slope <= 1){
+    return "anxious";
+  } else if (slope > 1 && slope <= 1.21){
+    return "angry";
+  } else if (slope > 1.21){
+    return "stressed";
+  } else{
+    return "tired";
   }
+  
+  //switch(slope){
+  //  case (slope <= 0.25 && slope > -0.6):
+  //      return "calm";
+  //  case slope > 0.25 && slope <= 0.6 :
+  //      return "happy";
+  //  case slope > 0.6 && slope <= 1:
+  //      return "anxious";
+  //  case slope > 1 && slope <= 1.21 :
+  //      return "angry";
+  //  case slope > 1.21: 
+  //      return "stressed";
+  //  default : 
+  //     return "tired";
+  //}
 
 }
 
@@ -331,12 +350,62 @@ class Music
   
   void playMusic()
   {
-    if(currently_playing)
+    String c_md = mood_selector();
+    int c_md_state = getMoodState(c_md);
+
+    if(c_md.equals(current_mood)){
       return;
-    String  music_name = Filenames.get_filename(mood);
-    AudioPlayer song = minim.loadFile(base_path+"/" + mood_selector() + "/" + music_name "/");
-    song.play();
-    currently_playing = true;
+    } else{
+      String music_name = file_names.get_filename(c_md_state);
+
+      AudioPlayer song = minim.loadFile(base_path+"/" + c_md + "/" + music_name + "/");
+      song.play();
+      currently_playing = true;
+    }
   }
+	
+  
+
+  int getMoodState(String mood){
+    
+    if ( mood.equals("calm")){
+      return 2;
+    } else if (mood.equals("happy")){
+       return 3;
+    } else if (mood.equals("anxious")){
+      return 1;
+    } else if (mood.equals("angry")){
+      return 0;
+    } else if ( mood.equals("stressed")){
+      return 4;
+    } else {
+      return 5;
+    }
+    
+    //switch(mood){
+    //case mood.equals("calm"):
+    //    return 2;
+    //case mood.equals("happy") :
+    //    return 3;
+    //case mood.equals("anxious"):
+    //    return 1;
+    //case mood.equals("angry"):
+    //    return 0;
+    //case mood.equals("stressed"):
+    //    return 4;
+    //default :  // tired
+    //   return 5;
+  }
+
+	void fadeOut(AudioPlayer oldsong){
+	  oldsong.shiftGain(0, -50, 2000);
+	}
+
+	void fadeIn(AudioPlayer newsong){
+	  newsong.rewind();
+	  newsong.setGain(0);
+	  newsong.play();
+	  newsong.shiftGain(-50, 0, 2000);
+	}
   
 }

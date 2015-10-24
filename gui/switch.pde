@@ -63,8 +63,11 @@ ArrayList<String> listFilesForFolder_array(final File folder){
 }
 
 String get_filename(int state)
-{
+{    
     int index = rand.nextInt(filenames[state].size());
+    while (filenames[state].get(index).equals(".DS_Store")){
+      index = rand.nextInt(filenames[state].size());
+    }
     return filenames[state].get(index);
 }
 
