@@ -1,4 +1,6 @@
-
+/*
+>> Pulse Sensor Amped 1.1 <<
+*/
 
 
 volatile int rate[10];                    // used to hold last ten IBI values
