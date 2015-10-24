@@ -31,6 +31,7 @@ int BPMWindowWidth = 180;
 int BPMWindowHeight = 340;
 boolean beat = false;    // set when a heart beat is detected, then cleared
 ArrayList<Integer> current_bpm_set = new ArrayList<Integer>();
+String base_path = "/Users/nicholasdraper/Documents/MuddHacks/inside-out/music_files/";
 
 void setup() 
 {
@@ -81,6 +82,13 @@ void draw()
   }
   else
   {
+
+    update_current_mood(BPM);
+    int mood = mood_selector();
+    String  music_name = Filenames.get_filename(mood);
+
+
+
   background(0,0,0);
   noStroke();
 // DRAW OUT THE PULSE WINDOW AND BPM WINDOW RECTANGLES  
@@ -187,7 +195,7 @@ void update_current_mood(int bpm){
 }
 
 /* select the mood */
-int mood_selector(){
+String mood_selector(){
   int slope = 0;
   for (int i = 0; i < current_bpm_set.size()-1; i++ ){
       slope += current_bpm_set.get(i+1) - current_bpm_set.get(i+1);
@@ -211,17 +219,17 @@ int mood_selector(){
 
   switch(slope){
     case slope <= 0.25 && slope > -0.6:
-        return CALM;
+        return "calm";
     case slope > 0.25 && slope <= 0.6 :
-        return HAPPY;
+        return "happy";
     case slope > 0.6 && slope <= 1:
-        return ANXIOUS;
+        return "anxious";
     case slope > 1 && slope <= 1.21 :
-        return ANGRY;
+        return "angry";
     case slope > 1.21 
-        return STRESSED;
+        return "stressed";
     default : 
-       return TIRED;
+       return "tired";
   }
 
 }
@@ -325,7 +333,8 @@ class Music
   {
     if(currently_playing)
       return;
-    AudioPlayer song = minim.loadFile("/Users/nicholasdraper/Documents/MuddHacks/inside-out/music_files/calm/Relax Music 3.mp3");
+    String  music_name = Filenames.get_filename(mood);
+    AudioPlayer song = minim.loadFile(base_path+"/" + mood_selector() + "/" + music_name "/");
     song.play();
     currently_playing = true;
   }
