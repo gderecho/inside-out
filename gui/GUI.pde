@@ -30,8 +30,7 @@ int PulseWindowHeight = 300;
 int BPMWindowWidth = 180;
 int BPMWindowHeight = 340;
 boolean beat = false;    // set when a heart beat is detected, then cleared
-
-
+ArrayList<Integer> current_bpm_set = new ArrayList<Integer>();
 
 void setup() 
 {
@@ -179,6 +178,54 @@ void draw()
     take_care_flag = true;
   }
 }
+
+/* update current mood */
+void update_current_mood(int bpm){
+  if (current_bpm_set.size() < 50){
+    current_bpm_set.add(bpm);
+  }
+}
+
+/* select the mood */
+int mood_selector(){
+  int slope = 0;
+  for (int i = 0; i < current_bpm_set.size()-1; i++ ){
+      slope += current_bpm_set.get(i+1) - current_bpm_set.get(i+1);
+  }
+  slope = slope / (current_bpm_set.size()-1);
+
+  /* choose the mood according to slope*/
+  /*stressed slope = 1.225*/
+  /*tired slope = -1.45*/
+  /*angry slope = 1.2*/
+  /*anxious = 0.75 */
+  /*happy = 0.5 */
+  /*calm = 0 */
+
+  int ANGRY   = 0;
+  int ANXIOUS = 1;
+  int CALM    = 2;
+  int HAPPY   = 3;
+  int STRESSED = 4;
+  int TIRED   = 5;
+
+  switch(slope){
+    case slope <= 0.25 && slope > -0.6:
+        return CALM;
+    case slope > 0.25 && slope <= 0.6 :
+        return HAPPY;
+    case slope > 0.6 && slope <= 1:
+        return ANXIOUS;
+    case slope > 1 && slope <= 1.21 :
+        return ANGRY;
+    case slope > 1.21 
+        return STRESSED;
+    default : 
+       return TIRED;
+  }
+
+}
+
 
 //--------------------------------------------------------------------------------//
 
