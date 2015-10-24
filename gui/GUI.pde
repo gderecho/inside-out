@@ -32,9 +32,12 @@ int BPMWindowWidth = 180;
 int BPMWindowHeight = 340;
 boolean beat = false;    // set when a heart beat is detected, then cleared
 ArrayList<Integer> current_bpm_set = new ArrayList<Integer>();
-String base_path = "/Users/John/Documents/Inside_Out/inside-out";
-String current_mood = "";
+String base_path = "/Users/John/Documents/Inside_Out/inside-out/music_files";
+String current_mood = "happy";
+int bpm_buffer_size = 50;
 Filenames file_names = new Filenames();
+Minim minim;
+AudioPlayer song;
 
 void settings(){
   size(900,600);
@@ -42,6 +45,7 @@ void settings(){
 
 void setup() 
 { 
+  minim = new Minim(this);
   pic = loadImage("img/mudd_hacks_splash_no_button.png");
   cp5 = new ControlP5(this);
   noStroke();
@@ -186,55 +190,124 @@ void draw()
     clear();
     redraw();
     state = END;
-    music = new Music(0,0,0,0,new Minim(this));
-    music.playMusic();
+    //music = new Music(0,0,0,0,new Minim(this));
+    //music.playMusic();
+    //song = minim.loadFile("mysong.wav");
+    //String c_md = mood_selector();
+    int c_md_state = getMoodState(current_mood);
+    
+    String music_name = file_names.get_filename(c_md_state);
+    //println(music_name);
+    //println(c_md);
+    song = minim.loadFile(base_path+"/" + current_mood + "/" + music_name + "/");
+    song.play();
+    
+    println("debug 1");
     take_care_flag = true;
+    //println(current_mood);
+
+  } else if (take_care_flag){
+    /* if current mood is different */
+    
+    String c_md = mood_selector();
+    //println("the true loop");
+    println(c_md);
+    int c_md_state = getMoodState(c_md);
+
+    if(!c_md.equals("not changing")){  //no changing when the array is not filled up
+      println("debug 2");
+      if (song.isPlaying()){
+        song.shiftGain(0, -50, 2000);
+        song.close();
+      }
+      
+      String music_name = file_names.get_filename(c_md_state);
+      //println(music_name);
+      //println(c_md);
+      song = minim.loadFile(base_path+"/" + c_md + "/" + music_name + "/");
+      song.rewind();
+      song.setGain(-50);
+      song.play();
+      song.shiftGain(-50, 0, 2000);
+    }
+
   }
+
+
+
 }
 
 /* update current mood */
 void update_current_mood(int bpm){
-  if (current_bpm_set.size() < 50){
+  if (current_bpm_set.size() < bpm_buffer_size){
     current_bpm_set.add(bpm);
+  } else {
+    current_bpm_set.clear();
   }
 }
 
 /* select the mood */
 String mood_selector(){
-  int slope = 0;
-  for (int i = 0; i < current_bpm_set.size()-1; i++ ){
-      slope += current_bpm_set.get(i+1) - current_bpm_set.get(i+1);
-  }
-  slope = slope / (current_bpm_set.size()-1);
-
-  /* choose the mood according to slope*/
-  /*stressed slope = 1.225*/
-  /*tired slope = -1.45*/
-  /*angry slope = 1.2*/
-  /*anxious = 0.75 */
-  /*happy = 0.5 */
-  /*calm = 0 */
-
-  int ANGRY   = 0;
-  int ANXIOUS = 1;
-  int CALM    = 2;
-  int HAPPY   = 3;
-  int STRESSED = 4;
-  int TIRED   = 5;
-  
-  if (slope <= 0.25 && slope > -0.6){
-    return "calm";
-  } else if (slope > 0.25 && slope <= 0.6){
-    return "happy";
-  } else if (slope > 0.6 && slope <= 1){
-    return "anxious";
-  } else if (slope > 1 && slope <= 1.21){
-    return "angry";
-  } else if (slope > 1.21){
-    return "stressed";
+  //int slope = 0;
+  int bpm = 0;
+  if (current_bpm_set.size() == bpm_buffer_size){
+    println("mood selector true");
+    //for (int i = 0; i < current_bpm_set.size()-1; i++ ){
+    //  slope += current_bpm_set.get(i+1) - current_bpm_set.get(i+1);
+    //}
+    //slope = slope / (current_bpm_set.size()-1);
+    //println(slope);
+    /* choose the mood according to slope*/
+    /*stressed slope = 1.225*/
+    /*tired slope = -1.45*/
+    /*angry slope = 1.2*/
+    /*anxious = 0.75 */
+    /*happy = 0.5 */
+    /*calm = 0 */
+    
+    for (int i = 0; i < current_bpm_set.size(); i++ ){
+      bpm += current_bpm_set.get(i);
+    }
+    bpm = bpm/ current_bpm_set.size();
+    println(bpm);
+    int ANGRY   = 0;
+    int ANXIOUS = 1;
+    int CALM    = 2;
+    int HAPPY   = 3;
+    int STRESSED = 4;
+    int TIRED   = 5;
+    
+    //if (slope <= 0.25 && slope > -0.6){
+    //  return "calm";
+    //} else if (slope > 0.25 && slope <= 0.6){
+    //  return "happy";
+    //} else if (slope > 0.6 && slope <= 1){
+    //  return "anxious";
+    //} else if (slope > 1 && slope <= 1.21){
+    //  return "angry";
+    //} else if (slope > 1.21){
+    //  return "stressed";
+    //} else{
+    //  return "tired";
+    //}
+    if (bpm < 70){
+      return "tired";
+    } else if (bpm < 80){
+      return "happy";
+    } else if (bpm < 90){
+      return "calm";
+    } else if (bpm < 100){
+      return "anxious";
+    } else if (bpm < 110){
+      return "stressed";
+    } else{
+      return "angry";
+    }
+    
   } else{
-    return "tired";
+    return "not changing";
   }
+  
   
   //switch(slope){
   //  case (slope <= 0.25 && slope > -0.6):
@@ -323,50 +396,7 @@ void serialEvent(Serial port)
    }
 }
 
-
-
-//--------------------------------------------------------------------------------//
-
-class Music
-{
-  int x, y, w, h;
-  Minim minim;
-  Textlabel text;
-  boolean currently_playing=false;
-  
-  public Music(int x, int y, int w, int h, Minim minim)
-  {
-    this.x=x;
-    this.y=y;
-    this.w=w;
-    this.h=h;
-    this.minim = minim;
-    text = cp5.addTextlabel("label")
-                    .setText("Now Playing: ____ ____")
-                    .setPosition(x,y)
-                    .setColorValue(0xffffff00)
-                    .setFont(createFont("Times",24));
-  }
-  
-  void playMusic()
-  {
-    String c_md = mood_selector();
-    int c_md_state = getMoodState(c_md);
-
-    if(c_md.equals(current_mood)){
-      return;
-    } else{
-      String music_name = file_names.get_filename(c_md_state);
-
-      AudioPlayer song = minim.loadFile(base_path+"/" + c_md + "/" + music_name + "/");
-      song.play();
-      currently_playing = true;
-    }
-  }
-	
-  
-
-  int getMoodState(String mood){
+int getMoodState(String mood){
     
     if ( mood.equals("calm")){
       return 2;
@@ -395,6 +425,59 @@ class Music
     //    return 4;
     //default :  // tired
     //   return 5;
+  }
+
+//--------------------------------------------------------------------------------//
+
+class Music
+{
+  int x, y, w, h;
+  Minim minim;
+  Textlabel text;
+  boolean currently_playing=false;
+  AudioPlayer song;
+  
+  public Music(int x, int y, int w, int h, Minim minim)
+  {
+    this.x=x;
+    this.y=y;
+    this.w=w;
+    this.h=h;
+    this.minim = minim;
+    text = cp5.addTextlabel("label")
+                    .setText("Now Playing: ____ ____")
+                    .setPosition(x,y)
+                    .setColorValue(0xffffff00)
+                    .setFont(createFont("Times",24));
+  }
+  
+  void playMusic()
+  {
+    String c_md = mood_selector();
+    int c_md_state = getMoodState(c_md);
+
+    if(c_md.equals(current_mood)){
+      return;
+    } else{
+      String music_name = file_names.get_filename(c_md_state);
+      println(music_name);
+      song = minim.loadFile(base_path+"/" + c_md + "/" + music_name + "/");
+      song.play();
+      
+      currently_playing = true;
+      current_mood = c_md;
+    }
+  }
+	
+  void changeSong(String song_name){
+    String c_md = mood_selector();
+    if (this.song.isPlaying()){
+      this.song.close();
+    }
+    this.song = minim.loadFile(base_path+"/" + c_md + "/" + song_name + "/");
+    this.song.play();
+    currently_playing = true;
+    current_mood = c_md;
   }
 
 	void fadeOut(AudioPlayer oldsong){
