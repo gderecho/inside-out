@@ -1,11 +1,14 @@
 import controlP5.*;
+import ddf.minim.*;
 
 PImage pic;
 ControlP5 cp5;
 Button test;
 boolean state;
+boolean take_care_flag;
 final boolean BEGIN = false;
 final boolean END = true;
+Music music;
 
 void setup() 
 {
@@ -28,11 +31,19 @@ void draw()
   }
   else
   {
-    clear();
   }
-  if(test.pressed())
+  if(test.pressed() && take_care_flag==false)
+  {
+    clear();
+    redraw();
     state = END;
+    music = new Music(0,0,0,0,new Minim(this));
+    music.playMusic();
+    take_care_flag = true;
+  }
 }
+
+//--------------------------------------------------------------------------------//
 
 class Button
 {
@@ -73,4 +84,39 @@ class Button
 
   }
 
+}
+
+
+//--------------------------------------------------------------------------------//
+
+class Music
+{
+  int x, y, w, h;
+  Minim minim;
+  Textlabel text;
+  boolean currently_playing=false;
+  
+  public Music(int x, int y, int w, int h, Minim minim)
+  {
+    this.x=x;
+    this.y=y;
+    this.w=w;
+    this.h=h;
+    this.minim = minim;
+    text = cp5.addTextlabel("label")
+                    .setText("Now Playing: ____ ____")
+                    .setPosition(x,y)
+                    .setColorValue(0xffffff00)
+                    .setFont(createFont("Times",24));
+  }
+  
+  void playMusic()
+  {
+    if(currently_playing)
+      return;
+    AudioPlayer song = minim.loadFile("/Users/nicholasdraper/Documents/MuddHacks/inside-out/music_files/calm/Relax Music 3.mp3");
+    song.play();
+    currently_playing = true;
+  }
+  
 }
