@@ -1,6 +1,7 @@
 import controlP5.*;
 import ddf.minim.*;
 import processing.serial.*;
+import java.io.*;
 
 PFont font;
 Scrollbar scaleBar;
@@ -55,7 +56,7 @@ void setup()
   rectMode(CENTER);
   ellipseMode(CENTER);  
 // Scrollbar constructor inputs: x,y,width,height,minVal,maxVal
-  scaleBar = new Scrollbar (400, 575, 180, 12, 0.5, 1.0);  // set parameters for the scale bar
+  //scaleBar = new Scrollbar (400, 575, 180, 12, 0.5, 1.0);  // set parameters for the scale bar
   RawY = new int[PulseWindowWidth];          // initialize raw pulse waveform array
   ScaledY = new int[PulseWindowWidth];       // initialize scaled pulse waveform array
   rate = new int [BPMWindowWidth];           // initialize BPM waveform array
@@ -91,7 +92,7 @@ void draw()
 // DRAW THE PULSE WAVEFORM
   // prepare pulse data points    
   RawY[RawY.length-1] = (1023 - Sensor) - 212;   // place the new raw datapoint at the end of the array
-  zoom = scaleBar.getPos();                      // get current waveform scale value
+  //zoom = scaleBar.getPos();                      // get current waveform scale value
   offset = map(zoom,0.5,1,150,0);                // calculate the offset needed at this scale
   for (int i = 0; i < RawY.length-1; i++) {      // move the pulse waveform by
     RawY[i] = RawY[i+1];                         // shifting all raw datapoints one pixel left
@@ -147,11 +148,11 @@ void draw()
   fill(eggshell);                                       // get ready to print text
   text("IBI " + IBI + "mS",600,585);                    // print the time between heartbeats in mS
   text(BPM + " BPM",600,200);                           // print the Beats Per Minute
-  text("Pulse Window Scale " + nf(zoom,1,2), 150, 585); // show the current scale of Pulse Window
+  //text("Pulse Window Scale " + nf(zoom,1,2), 150, 585); // show the current scale of Pulse Window
   
 //  DO THE SCROLLBAR THINGS
-  scaleBar.update (mouseX, mouseY);
-  scaleBar.display();
+  //scaleBar.update (mouseX, mouseY);
+  //scaleBar.display();
   }
   
    fill(250,0,0);
