@@ -30,7 +30,7 @@ int numBeats(String filename){
   for(int i = 0; i < beat.detectSize(); i++)
   {
     beat.detect(jingle.mix);
-  
+    
     if(beat.isOnset(i)){
       beats ++;
     }
@@ -43,7 +43,7 @@ Float[] avgFreq(String filename){
   float avg = 0.0;
   float time = 0.0;
   minim = new Minim(this);
-  jingle = minim.loadFile(filename, 1024);
+  jingle = minim.loadFile("./music/" + filename, 1024);
   float sampleRate = jingle.sampleRate();
   jingle.play();
   jingle.mute();
